@@ -26,16 +26,16 @@ if (file.name%>%endsWith(".csv")){
   s = st_read(file.name)
 }
 
-# check if there are invalid characters
-s = s%>%rename_all(tolower)
-check.invalid = function(t){
-  return(!str_match(t,"[^\\w]")[1,1] %>% is.na())
-}
-if (check.invalid(s%>%colnames())){
-  stop("Invalid character found! Please check column names.")
-}
+# to lowercase and replace invalid character with "_"
+s = s %>%
+  rename_all(tolower) %>%
+  rename_all({function (t) str_replace_all(t,"[^\\w]","_")})
 
 glimpse(s)
 
 # writing to postgres
 st_write(obj = s, dsn = conn, Id(table = table.name))
+
+
+
+
